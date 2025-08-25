@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caldwell Contemporary</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #fafafa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 3rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .gallery-name {
+            font-size: 1.4rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .gallery-name span {
+            font-weight: 500;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #000;
+        }
+
+        /* Content Sections */
+        .hero {
+            margin-top: 80px;
+            padding: 4rem 3rem;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .hero-content, .gallery-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .exhibition-title {
+            font-size: 3.5rem;
+            font-weight: 200;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+        }
+
+        .exhibition-artist {
+            font-size: 1.3rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+            font-weight: 300;
+        }
+
+        .exhibition-dates {
+            font-size: 0.95rem;
+            color: #999;
+            margin-bottom: 2rem;
+            letter-spacing: 0.5px;
+        }
+
+        .exhibition-description {
+            max-width: 700px;
+            line-height: 1.8;
+            color: #555;
+            font-size: 1.05rem;
+        }
+
+        /* Gallery */
+        .gallery-container {
+            padding: 4rem 3rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #999;
+            margin-bottom: 3rem;
+            font-weight: 300;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin-bottom: 6rem;
+        }
+
+        .artwork-card {
+            background: white;
+            border-radius: 2px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .artwork-card:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            transform: translateY(-4px);
+        }
+
+        .artwork-image-container {
+            position: relative;
+            padding-bottom: 100%;
+            overflow: hidden;
+            background: #f5f5f5;
+        }
+
+        .artwork-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .artwork-card:hover .artwork-image {
+            transform: scale(1.05);
+        }
+
+        .artwork-info {
+            padding: 1.5rem;
+        }
+
+        .artwork-title {
+            font-size: 1.1rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+            color: #222;
+        }
+
+        .artwork-artist {
+            font-size: 0.95rem;
+            color: #666;
+            margin-bottom: 0.3rem;
+        }
+
+        .artwork-details {
+            font-size: 0.85rem;
+            color: #999;
+            line-height: 1.5;
+        }
+
+        /* Lightbox */
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+        }
+
+        .lightbox.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .lightbox-image {
+            max-width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+            border-radius: 2px;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            color: white;
+            font-size: 3rem;
+            font-weight: 200;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .lightbox-close:hover {
+            opacity: 0.7;
+        }
+
+        .lightbox-info {
+            position: absolute;
+            bottom: -80px;
+            left: 0;
+            color: white;
+            padding: 1rem 0;
+            width: 100%;
+        }
+
+        .lightbox-title {
+            font-size: 1.3rem;
+            font-weight: 300;
+            margin-bottom: 0.3rem;
+        }
+
+        .lightbox-details {
+            font-size: 0.95rem;
+            opacity: 0.8;
+        }
+
+        /* Footer */
+        footer {
+            background: #222;
+            color: #666;
+            padding: 2rem 3rem;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem 1.5rem;
+            }
+
+            .nav-links {
+                gap: 1.5rem;
+            }
+
+            .gallery-name {
+                font-size: 1rem;
+                letter-spacing: 2px;
+            }
+
+            .exhibition-title {
+                font-size: 2rem;
+            }
+
+            .gallery-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .gallery-container {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="gallery-name">Caldwell <span>Contemporary</span></div>
+            <ul class="nav-links">
+                <li><a href="#about">About</a></li>
+                <li><a href="#exhibitions">Exhibitions</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- About Section -->
+    <section class="hero" id="about">
+        <div class="hero-content">
+            <h1 class="exhibition-title">About Caldwell</h1>
+            <p class="exhibition-description">
+                Caldwell Contemporary explores the revolutionary intersection of artificial intelligence and artistic expression. Our gallery showcases how AI technologies are transforming creative processes, producing works that challenge traditional boundaries between human and machine creativity.
+            </p>
+        </div>
+    </section>
+
+    <!-- Exhibition Section -->
+    <section class="hero" id="exhibitions" style="margin-top: 0; background: #f9f9f9;">
+        <div class="hero-content">
+            <h1 class="exhibition-title">AI Impressionism</h1>
+            <p class="exhibition-artist">A Digital Collection</p>
+            <p class="exhibition-dates">August 2025 – November 2025</p>
+            <p class="exhibition-description">
+                "AI Impressionism" presents a curated selection of works generated through leading artificial intelligence platforms. This exhibition demonstrates how AI interprets natural scenes, creating unique artistic visions that blend computational precision with impressionistic sensibilities.
+            </p>
+        </div>
+    </section>
+
+    <!-- Gallery -->
+    <section class="gallery-container">
+        <h2 class="section-title">On View</h2>
+        <div class="gallery-grid">
+            <div class="artwork-card" onclick="openLightbox(0)">
+                <div class="artwork-image-container">
+                    <img src="Works/beach.png" alt="Shoreline Study" class="artwork-image">
+                </div>
+                <div class="artwork-info">
+                    <h3 class="artwork-title">Shoreline Study</h3>
+                    <p class="artwork-artist">Playground.com</p>
+                    <p class="artwork-details">Serene, tranquil, luminous, expansive, coastal</p>
+                </div>
+            </div>
+
+            <div class="artwork-card" onclick="openLightbox(1)">
+                <div class="artwork-image-container">
+                    <img src="Works/chalet.jpg" alt="Alpine Refuge" class="artwork-image">
+                </div>
+                <div class="artwork-info">
+                    <h3 class="artwork-title">Alpine Refuge</h3>
+                    <p class="artwork-artist">Leonardo.ai</p>
+                    <p class="artwork-details">Majestic, pristine, secluded, atmospheric, alpine</p>
+                </div>
+            </div>
+
+            <div class="artwork-card" onclick="openLightbox(2)">
+                <div class="artwork-image-container">
+                    <img src="Works/ship.jpg" alt="Voyage" class="artwork-image">
+                </div>
+                <div class="artwork-info">
+                    <h3 class="artwork-title">Voyage</h3>
+                    <p class="artwork-artist">Leonardo.ai</p>
+                    <p class="artwork-details">Adventurous, nostalgic, maritime, weathered, timeless</p>
+                </div>
+            </div>
+
+            <div class="artwork-card" onclick="openLightbox(3)">
+                <div class="artwork-image-container">
+                    <img src="Works/thunderstorm.png" alt="Storm Front" class="artwork-image">
+                </div>
+                <div class="artwork-info">
+                    <h3 class="artwork-title">Storm Front</h3>
+                    <p class="artwork-artist">Playground.com</p>
+                    <p class="artwork-details">Dramatic, powerful, turbulent, electric, ominous</p>
+                </div>
+            </div>
+
+            <div class="artwork-card" onclick="openLightbox(4)">
+                <div class="artwork-image-container">
+                    <img src="Works/yellowship.jpg" alt="Golden Vessel" class="artwork-image">
+                </div>
+                <div class="artwork-info">
+                    <h3 class="artwork-title">Golden Vessel</h3>
+                    <p class="artwork-artist">Microsoft Bing</p>
+                    <p class="artwork-details">Radiant, warm, optimistic, vibrant, luminescent</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+        <div class="lightbox-content">
+            <img src="" alt="" class="lightbox-image" id="lightboxImage">
+            <div class="lightbox-info">
+                <h3 class="lightbox-title" id="lightboxTitle"></h3>
+                <p class="lightbox-details" id="lightboxDetails"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        © 2025 Caldwell Contemporary. All rights reserved.
+    </footer>
+
+    <script>
+        const artworks = [
+            { title: "Shoreline Study", artist: "Playground.com", details: "Serene, tranquil, luminous, expansive, coastal" },
+            { title: "Alpine Refuge", artist: "Leonardo.ai", details: "Majestic, pristine, secluded, atmospheric, alpine" },
+            { title: "Voyage", artist: "Leonardo.ai", details: "Adventurous, nostalgic, maritime, weathered, timeless" },
+            { title: "Storm Front", artist: "Playground.com", details: "Dramatic, powerful, turbulent, electric, ominous" },
+            { title: "Golden Vessel", artist: "Microsoft Bing", details: "Radiant, warm, optimistic, vibrant, luminescent" }
+        ];
+
+        const imagePaths = [
+            "Works/beach.png",
+            "Works/chalet.jpg",
+            "Works/ship.jpg",
+            "Works/thunderstorm.png",
+            "Works/yellowship.jpg"
+        ];
+
+        function openLightbox(index) {
+            const lightbox = document.getElementById('lightbox');
+            document.getElementById('lightboxImage').src = imagePaths[index];
+            document.getElementById('lightboxTitle').textContent = artworks[index].title;
+            document.getElementById('lightboxDetails').textContent = artworks[index].details;
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Event listeners
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+
+        document.getElementById('lightbox').addEventListener('click', (e) => {
+            if (e.target.id === 'lightbox') closeLightbox();
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+    </script>
+</body>
+</html>
